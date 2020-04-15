@@ -46,10 +46,15 @@ const tasks = [
   const inputBody = form.elements["body"];
 
   // Events
+  console.log(objOfTask);
+  console.log(tasks);
+  console.log(arrOfTasks);
+
   renderAllTask(objOfTask);
   form.addEventListener("submit", onFormSubmitHandler);
 
   liistContainer.addEventListener("click", onDeleteHandler);
+  liistContainer.addEventListener("click", onDoneHandler);
 
   function renderAllTask(tasksList) {
     if (!tasksList) {
@@ -65,6 +70,8 @@ const tasks = [
     liistContainer.appendChild(fragment);
   }
 
+  // создаю шаблон для создания оболочки задачи
+  // в аргументах фунцкции выполнена деструктуризация
   function listItemTemplate({ _id, title, body } = {}) {
     const li = document.createElement("li");
     li.classList.add(
@@ -80,6 +87,12 @@ const tasks = [
     span.textContent = title;
     span.style.fontWeight = "bold";
 
+    // создание кнопки выполненой задачи
+    const doneBtn = document.createElement("button");
+    doneBtn.textContent = "Done task";
+    doneBtn.classList.add("btn", "btn-success", "ml-auto", "done-btn");
+
+    // создание кнопки удалить задачу
     const deleteBtn = document.createElement("button");
     deleteBtn.textContent = "Delete task";
     deleteBtn.classList.add("btn", "btn-danger", "ml-auto", "delete-btn");
@@ -89,12 +102,13 @@ const tasks = [
     article.classList.add("mt-2", "w-100");
 
     li.appendChild(span);
+    li.appendChild(doneBtn);
     li.appendChild(deleteBtn);
     li.appendChild(article);
 
     return li;
   }
-
+  // проверка на заполение инфы для задачи
   function onFormSubmitHandler(e) {
     e.preventDefault();
     const titleValue = inputTitle.value;
@@ -108,10 +122,12 @@ const tasks = [
     const task = createNewTask(titleValue, bodyValue);
 
     const listItem = listItemTemplate(task);
+
+    // добавление задачи в дом.
     liistContainer.insertAdjacentElement("afterbegin", listItem);
     form.reset();
   }
-
+  // создание новой задачи
   function createNewTask(title, body) {
     const newTask = {
       title,
@@ -144,6 +160,20 @@ const tasks = [
       const id = parent.dataset.taskId;
       const confirmed = deleteTask(id);
       deleteTaskFromHtml(confirmed, parent);
+    }
+  }
+
+  function changeColorTask(el) {
+    el.style.backgroundColor = "#4caf50";
+    el.style.textDecoration = "line-through";
+    console.log(el);
+  }
+
+  function onDoneHandler({ target }) {
+    if (target.classList.contains("done-btn")) {
+      const parent = target.closest("[data-task-id]");
+      const id = parent.dataset.taskId;
+      changeColorTask(parent);
     }
   }
 })(tasks);
