@@ -45,10 +45,20 @@ const tasks = [
   const inputTitle = form.elements["title"];
   const inputBody = form.elements["body"];
 
+  // проверка на наличие задач
+  // если их нет, то добавляю в дом.
+  if (Object.keys(objOfTask).length === 0) {
+    const noTaskItem = noTaskTemplate();
+    // console.log("ура");
+
+    // добавление задачи в дом.
+    liistContainer.insertAdjacentElement("afterbegin", noTaskItem);
+  }
+
   // Events
-  console.log(objOfTask);
-  console.log(tasks);
-  console.log(arrOfTasks);
+  // console.log(objOfTask);
+  // console.log(tasks);
+  // console.log(arrOfTasks);
 
   renderAllTask(objOfTask);
   form.addEventListener("submit", onFormSubmitHandler);
@@ -68,6 +78,32 @@ const tasks = [
       fragment.appendChild(li);
     });
     liistContainer.appendChild(fragment);
+  }
+
+  // создаю шаблон для сообщения о том, что нет задач
+  function noTaskTemplate() {
+    const liNotifi = document.createElement("li");
+    liNotifi.classList.add(
+      "list-group-item",
+      "d-flex",
+      "align-items-center",
+      "flex-wrap",
+      "mt-2",
+      "no-task"
+    );
+    const span = document.createElement("span");
+    span.textContent = "Задач нет";
+    span.style.fontWeight = "bold";
+
+    const article = document.createElement("p");
+    article.textContent = "Добавьте задачи";
+    article.classList.add("mt-2", "w-100");
+    liNotifi.appendChild(span);
+    liNotifi.appendChild(article);
+
+    // console.log("ура2");
+
+    return liNotifi;
   }
 
   // создаю шаблон для создания оболочки задачи
@@ -98,6 +134,8 @@ const tasks = [
     deleteBtn.classList.add("btn", "btn-danger", "ml-auto", "delete-btn");
 
     const article = document.createElement("p");
+    const art = document.createElement("abc");
+
     article.textContent = body;
     article.classList.add("mt-2", "w-100");
 
@@ -125,6 +163,14 @@ const tasks = [
 
     // добавление задачи в дом.
     liistContainer.insertAdjacentElement("afterbegin", listItem);
+
+    // ищу класс no-task, если есть, удаляю узёл
+    let liNoTask = document.querySelector(".no-task");
+    // console.log(liNoTask);
+    if (liNoTask) {
+      liNoTask.remove();
+    }
+    // очистить данные формы
     form.reset();
   }
   // создание новой задачи
@@ -152,6 +198,15 @@ const tasks = [
   function deleteTaskFromHtml(confirmed, el) {
     if (!confirmed) return;
     el.remove();
+    // если при удалении это последняя задача, то добавляю шаблон с просьбой добавить задачу
+    if (Object.keys(objOfTask).length === 0) {
+      // console.log("Надо добавить");
+      const noTaskItem = noTaskTemplate();
+      // console.log("добавляю что пусто");
+
+      // добавление задачи в дом.
+      liistContainer.insertAdjacentElement("afterbegin", noTaskItem);
+    }
   }
 
   function onDeleteHandler({ target }) {
@@ -166,7 +221,7 @@ const tasks = [
   function changeColorTask(el) {
     el.style.backgroundColor = "#4caf50";
     el.style.textDecoration = "line-through";
-    console.log(el);
+    // console.log(el);
   }
 
   function onDoneHandler({ target }) {
